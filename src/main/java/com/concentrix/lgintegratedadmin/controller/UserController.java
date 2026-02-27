@@ -42,15 +42,6 @@ public class UserController {
                 return ResponseEntity.notFound().build();
             });
     }
-    @GetMapping("/{userId}")
-    public ResponseEntity<UserDto> getUser(@PathVariable String userId) {
-        UserDto user = userService.getUserById(userId);
-        if (user != null) {
-            log.info("User found: name={}, email={}", user.getUsrId(), user.getEmail());
-            return ResponseEntity.ok(user);
-        }
-        return ResponseEntity.notFound().build();
-    }
 
     /**
      * 신규 사용자를 DB에 등록합니다.

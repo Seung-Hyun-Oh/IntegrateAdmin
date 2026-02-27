@@ -64,6 +64,7 @@ public class SecurityConfig {
                 .requestMatchers("/admin/**").hasRole("ADMIN") // 'ADMIN' 역할을 가진 사용자만 접근 허용
                 .requestMatchers("/shared/**").hasAnyRole("USER", "ADMIN") // 'USER' 또는 'ADMIN' 역할 접근 허용
                 // 허용 경로 / 인증 없이 접근 가능한 공개 경로 설정 (API, Swagger, SAML 관련)
+                .requestMatchers("/api/members/signup", "/api/members/login").permitAll()
                 .requestMatchers("/api/**").permitAll()
                 .requestMatchers("/v3/api-docs/**"
                     , "/swagger-ui/**"
@@ -156,7 +157,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("<http://localhost:3000>"));    // 허용할 오리진
+        configuration.setAllowedOrigins(List.of("http://localhost:3000"));    // 허용할 오리진
         configuration.setAllowedMethods(List.of("*"));                          // 허용할 HTTP 메서드
         configuration.setAllowedHeaders(List.of("*"));                          // 모든 헤더 허용
         configuration.setAllowCredentials(true);                                    // 인증 정보 허용
