@@ -72,7 +72,7 @@ public class KafkaConsumerService {
 
             JobParameters jobParameters = new JobParametersBuilder()
                     .addLong("time", System.currentTimeMillis())
-                    .addInt("itemCount", itemsToProcess.size())
+                    .addLong("itemCount", (long) itemsToProcess.size())
                     .toJobParameters();
             
             jobLauncher.run(productImportJob, jobParameters);

@@ -15,7 +15,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.saml2.provider.service.authentication.OpenSaml5AuthenticationProvider;
+import org.springframework.security.saml2.provider.service.authentication.OpenSaml4AuthenticationProvider;
 import org.springframework.security.saml2.provider.service.authentication.Saml2AuthenticatedPrincipal;
 import org.springframework.security.saml2.provider.service.authentication.Saml2Authentication;
 import org.springframework.security.web.SecurityFilterChain;
@@ -124,12 +124,12 @@ public class SecurityConfig {
      */
     @Bean
     public AuthenticationProvider saml2AuthenticationProvider() {
-        OpenSaml5AuthenticationProvider provider = new OpenSaml5AuthenticationProvider();
+        OpenSaml4AuthenticationProvider provider = new OpenSaml4AuthenticationProvider();
 
         // SAML 응답(Response)을 받았을 때 실행될 컨버터 설정
         provider.setResponseAuthenticationConverter(responseToken -> {
             // 기본 SAML 인증 객체 생성
-            Saml2Authentication authentication = OpenSaml5AuthenticationProvider
+            Saml2Authentication authentication = OpenSaml4AuthenticationProvider
                 .createDefaultResponseAuthenticationConverter()
                 .convert(responseToken);
 

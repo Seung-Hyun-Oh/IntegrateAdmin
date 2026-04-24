@@ -7,6 +7,7 @@ import com.concentrix.lgintegratedadmin.dto.MemberSignupRequest;
 import com.concentrix.lgintegratedadmin.dto.UserDto;
 import com.concentrix.lgintegratedadmin.mapper.MemberMapper;
 import com.concentrix.lgintegratedadmin.security.JwtTokenProvider;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,7 +15,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
+import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -29,11 +34,23 @@ class MemberServiceTest {
     @Mock
     private JwtTokenProvider jwtTokenProvider;
 
+    @Mock
+    private RedisTemplate<String, Object> redisTemplate;
+
+    @Mock
+    private ValueOperations<String, Object> valueOperations;
+
     @Spy
     private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @InjectMocks
     private MemberService memberService;
+
+    @BeforeEach
+    void setUp() {
+        // redisTemplate.opsForValue()가 valueOperations를 반환하도록 설정
+        lenient().when(redisTemplate.opsForValue()).thenReturn(valueOperations);
+    }
 
     @Test
     @DisplayName("회원가입 성공 테스트")
@@ -89,5 +106,6 @@ class MemberServiceTest {
         assertThat(response.getToken()).isEqualTo("mock-token");
         assertThat(response.getEmail()).isEqualTo(email);
         verify(passwordEncoder, times(1)).matches(anyString(), anyString());
+        verify(valueOperations, times(1)).set(eq("RT:" + email), eq("mock-token"), eq(1L), eq(TimeUnit.HOURS));
     }
 }

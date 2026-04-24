@@ -1,47 +1,24 @@
 package com.concentrix.lgintegratedadmin.controller;
 
+import com.concentrix.lgintegratedadmin.controller.api.ExternalInterfaceApi;
 import com.concentrix.lgintegratedadmin.util.ApiResponse;
 import com.concentrix.lgintegratedadmin.util.ApiUtil;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.View;
+import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
 import java.util.Map;
 
-@Tag(name = "외부 연동 관리 API", description = "PG/카드사 등 대외 시스템 인터페이스 제어")
 @RestController
-@RequestMapping("/api/v1/external")
 @RequiredArgsConstructor
 @Slf4j
-public class ExternalInterfaceController {
+public class ExternalInterfaceController implements ExternalInterfaceApi {
 
     private final ApiUtil apiUtil;
-    private final View error;
 
-    @Operation(
-            summary = "외부 결제 상태 조회",
-            description = "ApiUtil을 사용하여 외부 연동 서버로부터 결제 상태 정보를 동기식으로 조회합니다."
-    )
-    @ApiResponses(value = {
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "200",
-                    description = "조회 성공",
-                    content = @Content(schema = @Schema(implementation = ApiResponse.class))
-            ),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "504", description = "외부 시스템 타임아웃")
-    })
-    @GetMapping("/payment-status/{transactionId}")
-    public ApiResponse<Object> getExternalPaymentStatus(
-            @Parameter(description = "거래 번호", example = "TX_20260102_001")
-            @PathVariable String transactionId) {
+    @Override
+    public ApiResponse<Object> getExternalPaymentStatus(String transactionId) {
 
         // 외부 시스템 URL (예시)
         String targetUrl = "api.external-pg.com" + transactionId;
@@ -55,13 +32,8 @@ public class ExternalInterfaceController {
         }
     }
 
-    @Operation(
-            summary = "외부 결제 승인 요청",
-            description = "결제 데이터를 외부 시스템에 동기식으로 POST로 전송하고 결과를 반환받습니다."
-    )
-    @PostMapping("/approve")
-    public ApiResponse<Map<String, Object>> requestApprove(
-            @RequestBody Map<String, Object> paymentData) {
+    @Override
+    public ApiResponse<Map<String, Object>> requestApprove(Map<String, Object> paymentData) {
 
         String targetUrl = "api.external-pg.com";
 
@@ -77,12 +49,8 @@ public class ExternalInterfaceController {
         }
     }
 
-    @Operation(
-        summary = "외부 결제 승인 요청",
-        description = "결제 데이터를 외부 시스템에 비동기식으로 POST로 전송하고 결과를 반환받습니다."
-    )
-    @PostMapping("/approveAsync")
-    public Mono<ApiResponse<Map<String, Object>>> requestApproveAsync(@RequestBody Map<String, Object> paymentData) {
+    @Override
+    public Mono<ApiResponse<Map<String, Object>>> requestApproveAsync(Map<String, Object> paymentData) {
         String targetUrl = "api.external-pg.com"; // URL 프로토콜 명시 권장
 
         return apiUtil.postAsync(targetUrl, paymentData, Map.class)
@@ -95,13 +63,9 @@ public class ExternalInterfaceController {
                 return Mono.just(ApiResponse.error("결제 승인 요청 실패: " + e.getMessage()));
             });
     }
-    @Operation(
-        summary = "외부 결제 승인 요청",
-        description = "결제 데이터를 외부 시스템에 동기식으로 POST로 전송하고 결과를 반환받습니다."
-    )
-    @PostMapping("/approveAsync1")
-    public ApiResponse<Map<String, Object>> requestApproveAsync1(
-            @RequestBody Map<String, Object> paymentData) {
+
+    @Override
+    public ApiResponse<Map<String, Object>> requestApproveAsync1(Map<String, Object> paymentData) {
 
         String targetUrl = "api.external-pg.com";
 

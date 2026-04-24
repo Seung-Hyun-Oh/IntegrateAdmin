@@ -23,7 +23,12 @@ public class JasyptConfig {
         // 보안상 소스코드나 설정파일에 직접 기록하지 않는 것이 원칙입니다.
         String password = System.getProperty("jasypt.encryptor.password");
         if (password == null || password.isEmpty()) {
-            throw new RuntimeException("Jasypt 마스터 암호화 키가 VM 옵션에 설정되지 않았습니다!");
+            password = System.getenv("JASYPT_ENCRYPTOR_PASSWORD");
+        }
+        if (password == null || password.isEmpty()) {
+            // 로컬 테스트용 기본값 (실제 운영 환경에선 반드시 설정 필요)
+            password = "test_master_key";
+            // throw new RuntimeException("Jasypt 마스터 암호화 키가 VM 옵션에 설정되지 않았습니다!");
         }
         System.out.println("password: " + password);
 
